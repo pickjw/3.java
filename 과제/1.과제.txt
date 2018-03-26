@@ -1,0 +1,24 @@
+    Alpha.java로 저장할것
+1.
+A
+AA
+AAA
+AAAA
+AAAAA
+
+2.  Alpha2.java 저장할것.
+
+A
+BC
+DEF
+GHIJ
+KLMNO
+
+3.  Star2.java를 save as Star3.java로 저장할것.=>
+
+*****
+ ****
+  ***
+   **
+    *
+==============================

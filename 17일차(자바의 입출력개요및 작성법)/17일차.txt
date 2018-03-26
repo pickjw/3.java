@@ -1,0 +1,183 @@
+17일차(자바의 입출력(I/O)개요및 작성법)
+
+===============================================
+예외처리->입출력->컬렉션=>쓰레드=>네트워크->람다
+------------------------
+
+서술형->이론개념(~비교,기술하라)
+================================
+소스코드를 분석->괄호,메서드?
+----------------------------
+Chapter 15장
+
+p868
+    입출력=>데이터 전송
+
+스트림(Stream)->source와 target사이의 데이터 전송을 하기위한
+                가상의 통로(=>무선랜)
+
+source=>데이터를 전송해주는 쪽 컴퓨터/핸드폰
+target=>데이터를 받는쪽 컴퓨터/핸드폰
+
+
+InputStream<--입력(read)
+OutputStream-->출력(write)
+
+**스트림의 특징
+
+1.양방향X ->단반향만 된다.
+2.다단계 결합->여러개의 스트림이 결합이 될 수 있다.(생성자)
+3.무한대기가 존재한다.=>입력받을때 까지 계속해서 유지하는 상태
+
+===============================================================
+
+입출력 클래스->70~80개(잘 쓰는 위주로 예제)
+입출력 클래스 분류=>전송해주는 데이터(문자,이미지,동영상)
+
+1.Byte기반스트림(p874)=>주로 이미지,동영상,문자(영문자)위주로 전송
+
+
+   입력스트림->read(),read(입력대상자) ,close()
+   출력스트림->write(출력대상자), close()
+
+   FileInputStream=>외부에서 파일의 정보를 읽어오기
+   ====
+   FileOutputStream->파일 저장
+   ====
+
+   FilterInputStream==>데이터가공
+   ======
+   FilterOutputStream
+   ======
+
+   BufferedInputStream
+   ========(대용량)------>읽어들이는 속도를 증가
+
+   DataInputStream->자바의 기본 자료형의 데이터를 읽어들일때 사용
+   ====
+   DataOutputStream
+   ====
+   
+   ObjectInputStream->Object(Car,Person,,,)를 전달
+   ======
+   ObjectOutputStream
+
+          p886 DataInputStream,DataOutputStream 
+          p894->PrintStream=>System.out.println(~)표준출력장치
+          p889   FileReader,FileWriter
+          p911  ->RandomAccessFile->쓰레드 시간
+          p15    File 표15-26->p918->delete()
+          p934 직렬화? ObjectInputStream,ObjectOutputStream
+          p937 직렬화가 가능한 클래스 만들기
+
+
+외부에서 파일 불러올때 실패한 경우의 에러메세지
+
+java.io.FileNotFoundException: C:\webtest\3.java\readme2.txt (지정된 파일을 찾을 수 없습니다)
+외부에서 파일을 읽어들이는데 실패했습니다.!
+
+ 보조스트림->BufferedReader(한글데이터) BuffereInputStream(영문)
+                    2byte                       1byte
+
+ FilterTest.java
+ ===============
+
+InputStreamReader(InputStream in)
+                  ===============>InputStream객체를 넣어달라
+***************************************************************
+   자료형이 부모형  (=>객체 자동형변환)
+==>상속받은 자식클래스의 객체도 역시 생성자의 매개변수로 넣어줄
+   수 있다.
+**************************************************************
+
+InputStreamReader(FileInputStream in) =>FileInputStream객체만
+
+AudioInputStream, ByteArrayInputStream, 
+FileInputStream, FilterInputStream, 
+InputStream(System.in), ObjectInputStream,
+ PipedInputStream, SequenceInputStream,
+ StringBufferInputStream
+
+Reader클래스의 객체->생성자
+                    자식클래스의 객체도 생성자의 매개변수로 가능
+BufferedReader,
+ CharArrayReader,
+ FilterReader, 
+InputStreamReader,
+ PipedReader, 
+StringReader
+------------------------------------------------------------
+*****
+//키보드(System.in)를 통해서 한글데이터를 입력하라->InputStreamReader
+		/*InputStreamReader isr=new InputStreamReader(System.in);
+		BufferedReader br=new BufferedReader(isr);*/
+		//키보드로 한글데이터가 깨지지않도록 데이터를 읽어들일때 사용구문
+		BufferedReader br=new BufferedReader
+				                         (new InputStreamReader(System.in));
+*****
+---------------------------------------------------------------------
+이름은?
+hong
+국어점수?
+59
+영어점수?
+90
+이름=hong,총점=>149
+===============================================================
+FileViewer.java->예제(채팅창)
+
+****
+byte[]--->String으로 변환 메서드?=>String의 생성자를 이용
+                                    String(byte[] bytes) 
+
+String->byte[]으로 변환시키는 메서드->getBytes()
+----------------------------------------------------------------
+ p876              인덱스번호, 배열의 길이
+     input.read(temp,0,temp.length)
+     input.read(temp)
+
+DataInputStream
+DataOutputStream
+=================
+
+파일에 저장->String형으로 저장->FileOutputStream(영문데이터)
+                                FileWriter(한글데이터)
+             회원가입->콘솔
+
+파일에 저장->int,double,float(기본형에 맞게)=>
+                               DataOutputStream+FileOutputStream
+                               ====
+p934
+
+파일에 저장=>객체를 저장(Car,Person,,,)ObjectInputStream,
+                                       ======
+                                       ObjectOutputStream
+                                       ======
+                (직렬화)
+ 메모리에 다시 불러오기 <--------------- 파일로 저장된 객체를
+                            (역직렬화)
+----------------------------------------------------------
+ 파일에 저장할때 저장하는 자료형에 맞게 저장하기위해
+  =>write자료형(저장대상자) <--->read자료형()
+
+  writeBoolean('true')<-->readBoolean()
+  ,,,,
+  writeString(X)->writeChars(String s)
+                  writeBytes(String s)
+  writeUTF('한글데이터')
+ ...
+=============================================================
+DataOutTest.java 저장
+======================
+ 컬렉션
+========
+
+
+
+
+
+
+
+
+
+

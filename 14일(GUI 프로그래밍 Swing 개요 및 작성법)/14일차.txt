@@ -1,0 +1,269 @@
+14일(GUI 프로그래밍 Swing 개요 및 작성법)
+
+ShapeTest.java를 save ShapeTest2.java로 저장(추상클래스,인터페이스)
+
+---------------------------------------------------------------------
+ 추상클래스,인터페이스=>전체 프로그램에서 사용될 공통의 메서드,상수가
+                        필요로할때 선언(명세서)(표준화)
+---------------------------------------------------------------------
+ 
+  실행결과
+ 
+  원하는 도형선택? 1.원 2.직사각형 3.종료 =>무한루프
+  1
+  1.원의 반지름을 입력?
+   5
+  도형의 면적은 ? 입니다.
+
+  원하는 도형선택? 1.원 2.직사각형 3.종료
+  2
+  1.사각형의 넓이(가로)을 입력?
+   10		  
+  2.사각형의 높이(세로)을 입력?
+   20
+   도형의 면적은 200 입니다
+
+  원하는 도형선택? 1.원 2.직사각형 3.종료
+  3
+   프로그램이 정상종료됩니다.=>System.exit(0);
+----------------------------------------------------
+
+과제)
+   j1221 패키지 작성
+   ------
+    조건1) ConvertTest save as ConverTest2.java
+    조건2) 무한루프->for(;;) or while(true)=>계속 입력을 받겠다.
+    조건3) exit->e or E->무조건 프로그램 종료
+           System.exit(0);=>프로그램을 종료시켜주는 메서드
+           문자열 비교하는 메서드->equals()이용
+    조건4)  agAG2asg
+            2aga2ga
+            adga2-->숫자를 입력?->isXXXX (Character)
+            ->영문자만 입력이 가능합니다(경고)
+            ->자동으로 종료(탈출)-
+
+<실행결과>
+
+문자열을 입력?
+ddgA
+DDGa
+문자열을 입력?
+AGAG
+agag
+문자열을 입력?
+AG2
+ag영문자만 입력하세요!
+프로그램 자동종료
+
+문자열을 입력?
+agagG
+AGAGg
+문자열을 입력?
+e   =======>사용자로부터 e를 입력을 받는 경우
+프로그램이 정상적으로 종료됩니다.!
+-------------------------------------------------
+**************************************************
+public 전달할 객체의 자료형 getXXX(){
+       (=참조형)
+   객체 생성하는 구문
+  return 객체명;
+}
+
+//(2)Scanner객체를 만들어서 갖다주는 메서드 작성->getXXXX()
+	public Scanner  getScan() {  //반환형(객체)
+		Scanner sc = new Scanner(System.in);
+		return sc;
+	}
+	
+	//(3)main->setXXX(객체)=>메서드호출->출력
+	public void setScan(Scanner sc) {
+		System.out.println("문자열을 입력하세요?");
+		String str = sc.nextLine();
+		System.out.println("입력받은 문자열은=>"+str);
+	}
+*************************************************
+형식) public void setXXX(전달받을 자료형 객체명(=임시로)){
+         객체를 이용해서 메서드 호출->객체명.메서드명(~)
+  }
+----------------------------------------------------------
+  JDBC Programming->사이트(오라클,Mysql)->접속=>테이블태그
+-----------------------------------------------------------
+그래픽(AWT,Swing)=>1.네트워크 프로그래밍(채팅)
+                   2.JDBC Programming
+                   -----------------------------
+
+ FrameTest.java
+
+ AWT(가장 기본적인 그래픽),Swing(그래픽이 화려)
+   window98                  window 7이상
+
+
+ 자바의 GUI 프로그램을 작성하는 방법=>안드로이드(모바일)
+
+1.import java.awt.*;
+
+2.창(Frame->JFrame)을 생성->화면에 출력
+3.창의 넓이,높이를 지정
+4.창을 화면에 출력
+=========================================
+
+
+
+**Component : 자바AWT에서 제공하는 버튼, 체크박스 등의 윈도우 환경을 이루는 부분들을 컴포넌트라고 한다. 
+              입력양식
+
+Container : 컴포넌트를 담는 그릇 역할을 컨테이너라고 한다.
+Frame, Window, Dialog, FileDialog, Panel, Applet 등의 하위 클래스를 가지고 있다
+컨테이너는 서브(sub) 컨테이너를 가질 수 있다
+일반적으로 서브 컨테이너로 Panel 클래스가 많이 사용된다
+
+
+
+Class Frame
+
+java.lang.Object
+   java.awt.Component->컴포넌트에 관련된 클래스
+     java.awt.Container->컴포넌트를 담을 수 있는 클래스
+        java.awt.Window->윈도우창
+            java.awt.Frame->어플리케이션의 표준
+                          ->이벤트처리
+               javax.swing.JFrame->이벤트처리 X
+
+***기본 메서드***
+
+1.setSize(int w,int h)->모든 컴포넌트의 넓이,높이(픽셀)
+  <->getSize()->컴포넌트의 크기를 가져오는 메서드
+
+2.setLocation(x,y)=>x,y축을 지정해주는 메서드
+3.->setBounds(x,y,w,h)=>위치및 크기를 지정해줄때 사용
+4.setBackground(색깔)->배경색을 부여
+  <->getBackground()
+
+5.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+6.화면에 출력->setVisible(true)
+========================================================
+ GUI 작성시 프로그램 사용법 공식
+
+ 창을 실행->화면에 띄우는 방법
+
+1.main()->JFrame객체생성->화면에 출력(X)
+2.JFrame or Frame클래스를 상속받아서 작성(O)
+  ->생성자에 디자인
+
+**API 문서 참조**
+
+ JFrame에서 
+
+수정목적->매개변수 O(String) 반환값X
+
+void setXXXX(String s)
+
+
+확대금지->메서드
+
+수정목적
+
+void setXXX(boolean )=>Frame클래스
+====================================
+ 찾는 메서드가 있는데 안 보이면 상속관계를 고려해서 
+ 찾을것.->부모클래스에서 찾을것
+
+------------------------------------------------------
+** 화면디자인->컴포넌트를 배치=>배치관리자 클래스가 존재
+
+창==>다른 컴포넌트를 부착->화면에 출력 ->BorderTest.java
+
+1.BorderLayout
+
+▶BorderLayout은 컨테이너의 경계선을 기준으로 하여  
+               동, 서, 남, 북, 중앙 의 다섯가지 위치를 
+               지정하여 컴포넌트를 배치한다.
+             ->부착시킬때 위치를 지정X
+             ->위치를 지정하지 않으면 무조건 맨마지막 컴포넌트
+               만 화면에 보이게 설정된 배치관리자
+    ========================================= 
+    Window, Frame, Dialog의 기본 레이아웃이다.
+    ===========================================
+
+▶ 하나의 방향에는 하나의 컴포넌트 또는 하나의 컨테이너 만 배치된다.
+▶ 컴포넌트들의 적정 size를 유지하지 못함 즉 컴포넌트의 크기가 컨테이너 크기에 좌우된다. 컴포넌트의 배치는 그대로 이고 크기만 변함
+▶ 폭을 늘리면 북, 중앙, 남쪽이 늘어나고 높이를 늘리면 동,서,중앙이 늘어 난다. 
+생성형식) BorderLayout()
+    BorderLayout(int hgap, int vgap)
+hgap, vgap : 컴포넌트들 사이의 간격을 의미하며 픽셀단위로 지정 hgap옆간격을 나타내며 vgap는 위아래간격을 나타냄
+
+public void setBackground(Color bgColor)
+                          =====>Color클래스의 객체를 매개변수
+                                넣어달라
+Sets the background color of this window. 
+
+
+public static final Color black==>Color.BLACK, Color.black
+                                  검정색
+
+
+   Frame vs JFrame
+
+ Frame->직접 컴포넌트,색깔을 직접 적용
+ JFrame앞에 ContentPane 부분에 부착
+
+  JFrame객체명.getContentPane().setLayout(~)=>배치관리자를 변경
+  JFrame객체명.getContentPane().setBackground(~)=>배경색깔변경
+
+
+  getContentPane()=>ContentPane객체를 얻어오는 메서드
+
+Exception in thread "main" java.lang.IllegalArgumentException: cannot add to layout: unknown constraint: west
+	at java.awt.BorderLayout.addLayoutComponent(Unknown Source)
+	at java.awt.BorderLayout.addLayoutComponent(Unknown Source)
+	at javax.swing.JRootPane$1.addLayoutComponent(Unknown Source)
+	at java.awt.Container.addImpl(Unknown Source)
+	at java.awt.Container.add(Unknown Source)
+	at javax.swing.JFrame.addImpl(Unknown Source)
+	at java.awt.Container.add(Unknown Source)
+	at j1221.BorderTest2.<init>(BorderTest2.java:27)
+	at j1221.BorderTest2.main(BorderTest2.java:32)
+
+----------------------------------------------------------
+2.GridLayout=>표형태로 컴포넌트를 배치시키는 방법
+
+3.FlowLayout=>왼쪽컴포넌트를 기준->오른쪽방향으로 컴포넌트를
+              부착시키는 방법
+            =>만약에 오른쪽에 배치할 공간이 부족하면 다음라인에
+              자동으로 이동해서 배치
+
+   setLayout(변경시킬 배치관리자 객체명)
+               GridLayout,FlowLayout
+  
+4.배치관리자를 사용X=>setBounds(x,y,w,h)지정
+==================================================
+ ***=>GUI의 이벤트처리=>이벤트 처리 ppt 참조
+                     p403 내부클래스(=inner class)(익명클래스)
+                         =>이벤트처리를 하기위해서 필요 p410
+ =>
+
+ =>***객체형변환(p357,p370)->객체배열
+   p367 매개변수의 다형성
+   p362 instanceof연산자=>객체형변환**
+=============================================================
+ =>***8장.예외처리***
+ ->**15장.입출력(I/O)(웹프로그래밍)->13장 쓰레드->*****11장 컬렉션,12장(제네릭)****
+      파일첨부,다운로드(자료실)                        DB연동
+
+ ->**16장.네트워크->채팅프로그램->***14장 람다식(추가문법)
+                   JDBC Programming
+===============================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+

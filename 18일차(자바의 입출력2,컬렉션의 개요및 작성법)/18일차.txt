@@ -1,0 +1,284 @@
+18일차(자바의 입출력2 마무리,컬렉션의 개요및 작성법)
+
+스트림?->통신(네트워크)
+
+입력스트림
+출력스트림
+
+**스트림 구분->전송해주는 데이터의 종류
+
+             1.byte단위=>보편->영문자,이미지,동영상
+                         InputStream,OutputStream
+                         FileInputStream->영문위주파일
+
+             2.char단위=>2byte(한글데이터)->Reader
+                                            Writer
+
+                       FileReader<-한글로 저장된 파일
+                       FileWriter=>한글데이터 저장
+===================================================
+p894 **PrintStream==>다양한 데이터의 자료형을 출력목적
+
+     System.out.println()
+     ==========
+   
+     System.in=>객체로 취급=>InputStream객체
+     ex)System.in.read()
+     System.out.printf()
+
+  BufferedInputStream=>영문자 위두
+  ========(대용량)->버퍼->속도향상 기대
+
+  //한글위주
+
+  BufferedReader br=new BufferedReader
+       (new InputStreamReader(System.in));
+
+  InputStreamReader(읽을때) OutputStreamWriter(출력)  
+
+  한글깨지지는 경우->?????->한글데이터->2byte
+                            영문데이터->1byte
+   byte단위--->char단위
+  1byte-->2byte체제로 변경->전송
+   110->220
+
+  encoding->ksc5601->ecu-kr=>UTF-8(웹표준)
+
+  파일경로 표시(절대) ->c:\webtest\3.java\readme.txt
+               (상대) .(현재) ..(상위폴더)
+
+ if(args.length!=1){ //실행할때 동적으로 파일을 입력
+                       받지 못했을때 에러메세지 출력
+                       정상종료하라는 구문
+  }
+==================================================
+스프링(내부적인 작동원리=>객체직렬화)
+
+  웹->(홈페이지)사이트개발->웹서버와 연관
+
+ 웹서버->한 대이상 존재->네트워크 시간
+
+ 회원가입->에러발생(객체생성X->일반 메서드 호출X)-->
+
+   객체------------------>객체전송(USB,네트워크)
+         객체 직렬화(파일로 저장)->메모리에 로드
+                                   객체 역직렬화
+
+ 한 컴퓨터------------->다른 컴퓨터
+            데이터전송
+            (문자,이미지,동영상)
+
+ ObjectTest.java
+
+** 인터페이스
+
+ 1.설계목적->명세서 작성목적->추상메서드를 가지고 작업
+ 2.마커 인터페이스->설계목적X ->추상메서드 X
+                  ->Serializable=>객체직렬화 목적
+------------------------------------------------------
+//직렬화가 가능한 클래스를 작성->객체생성->네트워크,파일로 저장
+//형식) 클래스명 implements java.io.Serializable (maker 인터페이스)
+import java.io.Serializable;
+
+class Person implements Serializable{
+	String name;
+	int age;
+	String addr;
+	String tel;
+}
+
+                          11장. 자료구조(데이터를 저장하는 구조)
+                                    ->객체만 저장
+
+p490(Wrapper Class)=>  **컬렉션**(p578 핵심 인터페이스)
+                                데이터를 저장->메모리 상의 구조
+                                          Collection
+                                      List, Set, Map(속성)
+                                   p580 add(Object o)
+                                                  =====>데이터를 저장(객체만 저장
+                                                                                    가능)
+   기본 자료형(byte,short,int,long,float,double)=>저장X(객체가 아니기
+                    char,boolean 
+                                          때문)
+    =>Wrapper Class->기본자료형의 값을 객체형태로 만들어서
+                                 제공되는 클래스
+
+           --->기본자료형의 첫글자만 대문자로 쓰면->Wrapper클래스
+byte, ->Byte
+short,->Short
+int,=========>Integer.parseInt(~)
+long,--->Long
+float,-->Float
+double->Double
+char,=========>Character->Character.isDigit(),
+               Charatcer.toUpperCase()->대문자
+
+boolean ->Boolean  ====>*** String은 Wrappter Class가 아니다.
+----------------------------------------------------------------------
+        BoxingTest.java
+
+//자동 boxing-> 자바의 기본자료형-->자바의 객체형으로 변환
+
+/*Double d=new Double(123.45);//~Character c=new Character('a');
+         printDouble(d);*/
+         printDouble(new Double(123.45));
+         printDouble(143.67);//double d=143.67
+	}
+      //double->Double=>자동으로 기본자료형->객체형으로 변환돼서 전달
+	static void printDouble(Double obj2) { //123.45->toString()=>"123.45"
+		System.out.println(obj2.toString());
+	}
+---------------------------------------------------------------------
+자동 unboxing->자바의 객체형(Wrapper)->기본자료형으로 변환 (계산할때)
+//int sum=obj.intValue()+20;  //객체형->기본자료형+기본자료형->계산X
+         //Integer->int으로 변환
+ int sum=obj+20; 
+-------------------------------------------------------------------------
+  스택->한쪽은 막혀있고 한쪽은 open
+  큐-->양쪽이 다 open
+  배열->기차모양처럼 한쪽으로 쭉 늘여뜨린 구조(리스트)
+  사물함->특정키를 이용해서 값을 저장
+ .....>클래스로만 만들어져 있으며 있으면 =>메서드가 통일감X
+
+ ***목적->데이터 관리-> 데이터 추가,삭제,검색,삽입,수정***
+    같다                    add     remove     add     set
+
+ 인터페이스 작성(공통 메서드)---->java.util.Collection
+                                    데이터 저장 구조에 따라서
+                                      List
+                                      Set
+                                      Map
+           |
+        상속->자식클래스
+
+ 데이터를 관리->자바의 컬렉션->구조와 상관없이 공통적으로 사용(기능)
+ 
+ 1.데이터를 저장(추가)
+ 2.데이터를 삭제
+ 3.데이터를 수정->원하는 데이터만 수정
+ 4.데이터를 검색
+
+** 데이터의 구조(저장구조)에 따른 인터페이스 분류**
+
+1.Set  인터페이스
+
+  ->데이터가 중복 저장이 안되며 저장 되는 순서가 없다.(ex 항아리)
+  ->HashSet
+
+***2.List  인터페이스->중복저장이 가능,저장순서가 있다(인덱스번호로 구분)
+  
+   ->Vector->**ArrayList,LinkedList
+
+     =>ArrayList al=new ArrayList();
+        List  al=new ArrayList();
+
+        List al=new List();->인터페이스 객체X
+        =================
+          
+        직원=new 직원()
+        직원=new 프로그래머()->직원(프로그래머을 할 수있는 직원)
+        프로그래머 = (프로그래머)new 직원
+          자식          부모
+   =================================================================
+
+**3.Map 인터페이스->표형태로 저장 (키,값)=>ex)사물함 구조
+              -=>값을 저장시 키를 부여=>키를 이용->빨리 검색된다.
+
+   ->HashTable,*HsahMap=>세션값을 저장시(web)
+------------------------------------------------------------------------
+  **<자료형> =>제너릭?**
+------------------------------
+   VectorTest.java
+
+***컬렉션의 특성***
+
+1.객체만 저장(기본 자료형은 저장X->Wrapper 클래스를 이용 가능)==>
+              자동으로 Object형으로 저장->add(Object o)=>자동 형변환
+              ->원하지 않은 데이터도 저장이 될 가능성이 있다.
+           String----->Object
+           String ,Integer,Double-->Object으로 변경(에러 유발X)
+
+           String<-----(String)Object
+
+
+           Person------->Object
+                    (Person)Object ->에러유발
+================================================================
+ 
+
+2.정적배열(크기가 정해져 있는 경우)<->**동적배열(크기가 유동)
+      byte b[]=new byte[3];           args[]
+
+     Vector v=new Vector();
+     ArrayList al=new ArrayList();
+     HashMap hm=new HashMap();
+
+
+--------------------------------------------------------------
+  ***제너릭을 사용하는 배경***
+
+3.객체를 저장->형이 Object형으로 변환(어떠한 객체라도 다 저장이 가능
+
+  =>String만 저장 ->다른 데이터 저장을 안하게 하고 싶다.
+
+                                      하게 만들기위한 목적)
+ --->String(O),다른 데이터 저장X
+
+4.저장된 데이터를 꺼내올때 원래의 형으로 형변환시켜야 된다.
+  ->문제발생->자료형이 문제발생(ex Type mismatch)
+--------------------------------------------------------------------
+=><자료형(String)>=>저장할 자료형을 미리 지정하는=> "제너릭"
+
+ **제너릭을 사용하는 목적**
+
+  1.원하는 데이터만 저장이 가능=><String>
+  2.데이터를 꺼내올때 형변환을 할  필요가 없다.->원하는 데이터만 저장이 된 상태
+
+================================================================
+
+=>VectorTest.java
+=>ArrayListTest.java=>ArrayList
+=>리스트 구조내부에 배열이 저장이 된 구조
+
+**컬렉션의 값을 검색**->클래스 마다 조금씩 차이가 있다.(암기해야 된다.)
+                          ArrayList->get(인덱스번호)
+                          Vector->elementAt(인덱스번호)
+                          ,,,,
+===========================================================
+iterator()를 제공해주는 모든 클래스=>공통으로 검색하는 방법
+iterator,Enumeration을 제공
+============================================================
+
+p614->Iterator(hasNext()->데이터저장 유무확인?,next()->꺼내와라),
+      Enumeration(검색에 관련된 인터페이스)->p617
+                      (hasMoreElement(),nextElement())
+           데이터 저장 구조에 상관없이 공통적인 검색방법을 사용이 가능
+           =>메서드의 매개변수 또는 반환형을 통해서 객체를 얻어옴
+          ===================================
+ 컬렉션(12장)->제너릭의 정리<E>,<K,E>~
+==========================
+p644->HashMap,Hashtable(key,value)->사물함
+p647->표형태로 저장(키를 지정해서 저장)
+
+**인터페이스 객체를 생성하는 방법**
+
+**1.new연산자=============>상속관계를 이용해서
+   인터페이스형 객체명=new 인터페이스형() (X)
+
+        Volume v=new Volume(); (X)
+
+        List l=new List();//x
+        List l=new ArrayList();//(O)==>게시판의 글목록보기
+
+   인터페이스형 객체명=new 자식클래스형()->(O)
+        Volume v=new TV(); (O)
+        Volume v=new Audio(); (O)
+
+   Volume
+
+TV    Audio
+                           
+2.메서드의 매개변수를 이용=>메서드명(List li)
+**3.메서드의 반환형을 이용 =>Iterator,Enumeration=>Vector,ArrayList,,,
+
+================================================================

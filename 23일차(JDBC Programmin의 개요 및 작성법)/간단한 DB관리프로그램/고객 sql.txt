@@ -1,0 +1,28 @@
+***  고객테이블 작성 ( 오라클 기준)
+
+  웹사이트에서 도서를 관리->고객만 관리
+
+CREATE TABLE CUSTOMER(
+  C_BUN     NUMBER               NOT NULL, 
+  C_IRUM    VARCHAR2(10)         NOT NULL,
+  C_JUNHWA  VARCHAR2(14)         NOT NULL,
+  C_JUSO    VARCHAR2(50),
+  C_DAESU   NUMBER   DEFAULT 0   NOT NULL,
+  C_MEMO    VARCHAR2(4000),
+  PRIMARY KEY (C_BUN)
+);
+
+
+Insert into CUSTOMER(C_BUN, C_IRUM, C_JUNHWA, C_JUSO, C_DAESU, C_MEMO) Values(1, '이광민', '010-6397-8274', '서울시 중구 필동123', 0, null);
+Insert into CUSTOMER(C_BUN, C_IRUM, C_JUNHWA, C_JUSO, C_DAESU, C_MEMO) Values(2, '이영애', '010-2598-2165', '서울시 종로구 숭인동111', 0, null);
+Insert into CUSTOMER(C_BUN, C_IRUM, C_JUNHWA, C_JUSO, C_DAESU, C_MEMO) Values(3, '최강희', '010-6123-8435', '서울시 강남구 역삼1동111', 0, null);
+Insert into CUSTOMER(C_BUN, C_IRUM, C_JUNHWA, C_JUSO, C_DAESU, C_MEMO) Values(4, '김옥빈', '010-5666-2435', '서울시 강남구 역삼1동222', 0, null);
+Insert into CUSTOMER(C_BUN, C_IRUM, C_JUNHWA, C_JUSO, C_DAESU, C_MEMO) Values(5, '손예진', '010-5336-5687', '서울시 강남구 역삼1동333', 0, null);
+Insert into CUSTOMER(C_BUN, C_IRUM, C_JUNHWA, C_JUSO, C_DAESU, C_MEMO) Values(6, '김연아', '011-6996-9945', '서울시 강남구 역삼1동444', 0, null);
+Insert into CUSTOMER(C_BUN, C_IRUM, C_JUNHWA, C_JUSO, C_DAESU, C_MEMO) Values(7, '김연희', '010-6966-9945', '서울시 강남구 역삼1동555', 0, null);
+Insert into CUSTOMER(C_BUN, C_IRUM, C_JUNHWA, C_JUSO, C_DAESU, C_MEMO) Values(8, '이효리', '010-3289-1329', '서울시 강남구 역삼1동666', 0, null);
+Insert into CUSTOMER(C_BUN, C_IRUM, C_JUNHWA, C_JUSO, C_DAESU, C_MEMO) Values(9, '한지민', '010-3976-1328', '서울시 강남구 역삼1동777', 0, null);
+Insert into CUSTOMER(C_BUN, C_IRUM, C_JUNHWA, C_JUSO, C_DAESU, C_MEMO) Values(10, '한예슬', '010-1393-1317', '서울시 중구 필동456', 0, null);
+
+
+COMMIT;

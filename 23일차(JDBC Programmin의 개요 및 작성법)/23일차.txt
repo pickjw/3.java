@@ -1,0 +1,449 @@
+23일차(JDBC Programmin의 개요 및 작성법)
+
+ JDBC->DB(Oracle,   MySQL(=or Maria),,,)
+           실무    개인(운영) 또는 중소규모
+
+1.JDBC Programming의 전체적인 과정을 이해->Web Programming 이해
+2.Table을 하나->Swing을 사용(도구)->DML(insert,update,delete,select)
+                                  ->CRUD
+--------------------------------------------------------------------
+->수요일(웹 프로그래밍->자바스크립트(오전),오후(프로젝트)->금요일
+->제출(다음 주 화요일)->1.개인별로 프로젝트를 작성->자바프로젝트폴더
+                                                    java파일,ppt
+
+                        2.2명이상 프로젝트 작성->java파일,ppt(구성원)
+====================================================================
+JSP(4주->4.5주) 프로젝트 팀별(4~5명 정도)
+=========================================
+
+****JDBC Programming 과정순서***
+=>수요일 프로젝트시간 시험
+
+1.DB연결->계정명,암호 필요->
+  Class.forName("oracle.jdbc.driver.OracleDriver");//메모리에 로드
+
+import java.sql.*;//DB연결->계정X,암호X
+
+public class DBTest {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+        Connection con=null;//연결객체
+        String url="jdbc:oracle:thin:@localhost:1521:orcl";
+        try {
+        	//1.접속할 데이터베이스의 드라이버를 메모리에 로드
+        	//상위패키지명.하위패키지명..OracleDriver(드라이버클래스명)
+        	Class.forName("oracle.jdbc.driver.OracleDriver"); 
+        	//2.연결객체 얻어온다.(1.접속할 컴퓨터의 위치 2.접속할계정 3.암호)
+        	con=DriverManager.getConnection(url, "scott", "tiger");
+            System.out.println("접속 con=>"+con);
+        }catch(Exception e) {
+        	System.out.println("DB연결에 실패=>"+e);
+        }
+	}
+}
+
+2.con=DriverManager.getConnection(url, "scott", "tiger")
+
+접속 con=>oracle.jdbc.driver.T4CConnection@23ab930d
+
+
+3.SQL구문을 사용->
+                  ******************차이점*********************
+                  1)Statement객체->문장객체
+                  2)PreparedStatement객체->준비된 문장객체
+                                         ->인수질의(=파라미터질의)
+                     ->PreparedStatement객체를 이용하는것이 더 좋다.
+
+                     ->실행속도가 빠르다,데이터를 입력,수정,삭제,
+                       검색할때 코딩이 편리하다.
+                  ************************************************
+SQL> select * from dept; //SQL구문을 사용
+
+ **ResultSet객체=>테이블형태로 보여주는 자바의 SQL객체**
+
+
+     숫자  문자열         문자열
+
+ ** 원하는 필드를 불러오는 방법->rs.get필드의 자료형("필드명") 
+                                 rs.get필드의 자료형(숫자(불러오는 순서))
+
+ex) //int deptno=rs.getInt("deptno")
+    int deptno=rs.getInt(1)  ->select * from dept
+
+    //String dname=rs.getString("dname")
+    String dname=rs.getString(2) ======>권장X
+
+                               ->select dname,deptno from dept;
+                                          1      2
+
+  ***select구문이 변경이 일어날 수 있기때문에 항상 필드명으로 불러올것***
+
+    System.out.println("부서번호=>"+deptno)
+
+    DEPTNO DNAME          LOC
+---------- -------------- -----------
+        10 ACCOUNTING     NEW YORK  ---->rs.first();//맨처음 레코드이동
+        20 RESEARCH       DALLAS    ----->rs.next()=>다음에 보여줄 레코드가 존재
+                                                     하면 반환값을 true
+                                                     시켜주고 그 위치로 이동
+                                                     시켜주는 메서드
+
+        30 SALES          CHICAGO   ----->rs.next() ,rs.previous()이전 레코드로 이동
+
+        40 OPERATIONS     BOSTON    ----->rs.last();//맨 마지막 레코드로 이동
+
+
+부서번호가 40인 데이터를 찾아서 그 부서의 부서명과 위치를 구해주는
+SQL구문을 작성->=> 검색할 필드명 연산자 찾을값
+
+select dname,loc
+from dept
+where deptno=40;
+
+SQL> select dname,loc
+  2  from dept
+  3  where deptno=40;
+
+DNAME          LOC
+-------------- ----------
+OPERATIONS     BOSTON
+
+부서번호만 30번인 부서를 찾아라?
+
+statement->매번 SQL구문을 실행할때 처음부터 다시 입력->실행
+         ->select dname,loc from dept where deptno=30;
+
+PreparedStatement객체==>자주 사용이 되는 부분의 SQL구문은 그대로
+                        사용하고 바뀌는 부분만 다시 코딩부분
+                         &파라미터값=>?
+
+  1  select dname,loc
+  2  from dept
+  3* where deptno=&deptno
+
+  =>1  select dname,loc
+  2  from dept
+  3* where deptno=?   //바뀌는 부분만 ? =>웹상에서 입력받는다는 표시
+
+SQL> /
+deptno의 값을 입력하십시오: 30
+구   3: where deptno=&deptno
+신   3: where deptno=30
+
+DNAME          LOC
+-------------- -------------
+SALES          CHICAGO
+
+SQL> /
+deptno의 값을 입력하십시오: 20
+구   3: where deptno=&deptno
+신   3: where deptno=20
+
+DNAME          LOC
+-------------- -------------
+RESEARCH       DALLAS
+
+SQL> /
+deptno의 값을 입력하십시오: 10
+구   3: where deptno=&deptno
+신   3: where deptno=10
+
+DNAME          LOC
+-------------- -------------
+ACCOUNTING     NEW YORK
+
+SQL>
+==============================================================
+4.SQL구문의 종류에 따라서 실행시키는 메서드가 다르다
+
+****차이점*****
+
+excuteQuery() 메소드  : SELECT문일 때,(검색할때 사용하는 메서드)
+
+                       리턴 값은 ResultSet클래스의 인스턴스로 접근
+                      =>SQL실행할때 테이블의 구조에 영향을 미치지
+                        않는 구문을 사용할때
+
+
+excuteUpdate() 메소드 : INSERT, UPDATE, DELETE문의내용 변경 
+                      리턴 값은 처리된 데이터 수를 정수형으로 반환
+
+
+create table,alter table,drop table=>DDL구문을 사용할때? 메서드?
+=>테이블의 구조에 영향을 미치는 SQL->executeUpdate()
+=================================================================
+5.DB연결 종료
+
+Connection 을 close()해주지 않으면 사용하지 않는 연결이 유지됨.=>메모리낭비
+
+DB 자원을 낭비하게 됨
+ResultSet 커서 연결 포인터, SQL문, DB 연결 해제
+close() 메소드 이용
+
+해제하는 순서->DB연결객체 포함해서 생성된 객체의 역순으로 메모리를 해제
+
+try{
+
+}catch(){
+
+}finally{
+  rs.close();			/*-- ResultSet 커서 --*/
+  pstmt.close(); // stmt.close();	/*-- SQL 문 --*/
+  Conn.close();			/*-- DB 연결 --*/
+}
+==================================================================
+1.테이블 생성->2.insert->3.select ==>
+
+실행하기전에 
+
+SQL> select * from mytest;
+select * from mytest
+              *
+1행에 오류:
+ORA-00942: 테이블 또는 뷰가 존재하지 않습니다
+=================================================
+
+실행후 결과
+
+접속 con=>oracle.jdbc.driver.T4CConnection@23ab930d
+MyTest 테이블 생성 OK!!!!
+이름=>Lee,나이=>34
+
+=================================================================
+
+//age int(3)--->rs.getInt("age")   rs.getString("age")
+
+1.person테이블을 작성->scott/tiger
+
+create table person(
+name varchar2(20),
+age varchar2(3),   
+tel varchar2(25));
+
+2.멤버변수선언 및 생성자,DB연결해제 구문 작성
+
+//3.DB연결->생성자->다른 메서드를 따로 뽑아서 작성->호출
+		connect();
+		//4.select * from person
+		select();
+		//5.x버튼을 클릭->프로그램 종료->DB작업한 내용을 메모리 해제
+		this.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				// TODO Auto-generated method stub
+				//DB연결해제
+				try {
+					if(rs!=null) rs.close();
+					if(pstmt!=null) rs.close();
+					if(con!=null) con.close();
+				}catch(Exception e2) {}
+				System.exit(0);
+			}
+		});
+	}
+	//단순,반복적으로 실행->매개변수X, 반환값 X
+	private void connect() {
+		
+	}
+	//application이 실행하면 무조건 ->select만
+	public void select() {
+		
+	}
+	
+======================================================
+
+
+
+ 중간점검
+---------------------------------------------------------
+접속 con=>oracle.jdbc.driver.T4CConnection@52d455b8
+pstm=>oracle.jdbc.driver.OraclePreparedStatementWrapper@5ae63ade
+rs=>oracle.jdbc.driver.OracleResultSetImpl@9660f4e
+정상적으로 DB메모리 해제됨!
+
+
+SQL> select * from person;
+
+선택된 레코드가 없습니다.
+
+SQL> insert into person values('홍길동','23','02-123-0987');
+
+1 개의 행이 만들어졌습니다.
+
+SQL> commit;  //메모리상의 변경사항-->테이블로 저장이 가능
+
+커밋이 완료되었습니다.
+
+
+ 실행한 결과
+----------------------------------------------------
+접속 con=>oracle.jdbc.driver.T4CConnection@52d455b8
+pstm=>oracle.jdbc.driver.OraclePreparedStatementWrapper@5ae63ade
+rs=>oracle.jdbc.driver.OracleResultSetImpl@9660f4e
+홍길동,23,02-123-0987
+정상적으로 DB메모리 해제됨!
+------------------------------------------------------------------
+//단순,반복적으로 실행->매개변수X, 반환값 X
+	private void connect() {
+        try {
+        	//1.접속할 데이터베이스의 드라이버를 메모리에 로드
+        	Class.forName("oracle.jdbc.driver.OracleDriver"); 
+        	//2.연결객체 얻어온다.(1.접속할 컴퓨터의 위치 2.접속할계정 3.암호)
+        	String url="jdbc:oracle:thin:@localhost:1521:orcl";
+        	con=DriverManager.getConnection(url, "scott", "tiger");
+            System.out.println("접속 con=>"+con);
+        }catch(Exception e) {
+        	System.out.println("DB접속 오류=>"+e);
+        }
+	}
+	//application이 실행하면 무조건 ->select만
+	public void select() { //select * from person;
+		try {
+			String sql="select * from person";
+			pstmt=con.prepareStatement(sql);
+			System.out.println("pstm=>"+pstmt);
+			rs=pstmt.executeQuery();
+			System.out.println("rs=>"+rs);
+			//person테이블에서 불러와서 JTable에 출력
+			while(rs.next()) {//불러올 수 있는 상태라면 rs.next()==true인 동안
+				String name=rs.getString("name");
+				String age=rs.getString("age");
+				String tel=rs.getString("tel");
+				//JTable의 화면에 출력
+				Object data[]= {name,age,tel};
+				model.addRow(data);//테이블의 필드값
+				//-----------------------------------------------
+				System.out.println(name+","+age+","+tel);
+			}
+		}catch(Exception e) {
+			System.out.println("select()메서드 실행중 오류=>"+e);
+		}
+	}
+===========================================================================
+ actionPerformed()에서 추가한 내용
+  ,,,,,
+//다입력하고 나서 값을 모델에 데이터를 입력->JTable에 결합해서 보여준다
+			//Object data[]= {"홍길동","23","02-123-0978"};
+			Object data[]= {tf1.getText(),tf2.getText(),tf3.getText()};
+			model.addRow(data);
+			//실제로 모델에 추가된 데이터를 person테이블에도 똑같이 필드별로 저장
+			try {
+				String sql="insert into person values(?,?,?)";
+				pstmt=con.prepareStatement(sql);
+				//pstmt.set자료형(?순서번호,저장할값)->setString,setInt~
+				pstmt.setString(1, tf1.getText());//입력받은 값을 그대로 적용
+				pstmt.setString(2, tf2.getText());
+				pstmt.setString(3, tf3.getText());
+				int insert=pstmt.executeUpdate();//1(성공) or 0(sql구문이 실패했을때 반환)
+				//insert한 레코드갯수 1
+				System.out.println("데이터 성공유무(insert)=>"+insert);
+				//제대로 데이터가 추가됐는지를 확인하는 방법
+				rs=pstmt.executeQuery("select * from person");
+				while(rs.next()) {//불러올 수 있는 상태라면 rs.next()==true인 동안
+					String name=rs.getString("name");
+					String age=rs.getString("age");
+					String tel=rs.getString("tel");
+					System.out.println(name+","+age+","+tel);
+				}
+				//-------------------------------------------------------------
+			}catch(Exception e2) {
+				System.out.println("person테이블에 데이터입력 실패=>"+e2);
+			}
+			//-------------------------------------------------------------------------
+			//재입력하도록 설정
+			tf1.setText("");
+			tf2.setText("");
+			tf3.setText("");
+			tf1.requestFocus();//커서입력
+		}
+==============================================================================
+오라클상에서 확인
+
+SQL> select * from person;
+
+NAME                 AGE TEL
+-------------------- --- -------------------------
+홍길동               23  02-123-0987
+테스트               43  02-123-8765
+=====================================================
+
+접속 con=>oracle.jdbc.driver.T4CConnection@52d455b8
+pstm=>oracle.jdbc.driver.OraclePreparedStatementWrapper@5ae63ade
+rs=>oracle.jdbc.driver.OracleResultSetImpl@9660f4e
+홍길동,23,02-123-0987
+테스트,43,02-123-8765
+
+데이터 성공유무(insert)=>1
+person테이블에 데이터입력 실패=>java.sql.SQLException: ORA-01006: 바인드 변수가 없습니다
+
+=>경고에러 메세지가 출력
+========================================================================
+ 1.기본적인 틀을 제공
+ 2.주제------------------>고객관리(쇼핑몰,도서관리 사이트(구민회관)->도서관
+                                          (도서관리)
+                                   자동차 매매 관리->고객관리,자동차관리
+                                  )
+                           ->두개이상의 테이블을 작성->고객,도서관리
+                                                           조인까지해서 화면에
+                                                       출력
+                             ==================================================
+  =>2월초->팀
+ 
+ 웹사이트를 가지고 작업->10~15개 작업
+=======================================================================
+***  고객테이블 작성 ( 오라클 기준)
+
+  웹사이트에서 도서를 관리->고객만 관리
+
+CREATE TABLE CUSTOMER(
+  C_BUN     NUMBER               NOT NULL, /* 고객번호 */
+  C_IRUM    VARCHAR2(10)         NOT NULL, /* 고객명*/
+  C_JUNHWA  VARCHAR2(14)         NOT NULL, /* 고객전화번호 */
+  C_JUSO    VARCHAR2(50),                  /* 고객주소 */
+  C_DAESU   NUMBER   DEFAULT 0   NOT NULL, /* 빌린 대여수 */
+  C_MEMO    VARCHAR2(4000),                /* 메모=>빌려간 책을 출력 */
+  PRIMARY KEY (C_BUN)
+);
+
+
+Insert into CUSTOMER(C_BUN, C_IRUM, C_JUNHWA, C_JUSO, C_DAESU, C_MEMO) Values(1, '이광민', '010-6397-8274', '서울시 중구 필동123', 0, null);
+Insert into CUSTOMER(C_BUN, C_IRUM, C_JUNHWA, C_JUSO, C_DAESU, C_MEMO) Values(2, '이영애', '010-2598-2165', '서울시 종로구 숭인동111', 0, null);
+Insert into CUSTOMER(C_BUN, C_IRUM, C_JUNHWA, C_JUSO, C_DAESU, C_MEMO) Values(3, '최강희', '010-6123-8435', '서울시 강남구 역삼1동111', 0, null);
+Insert into CUSTOMER(C_BUN, C_IRUM, C_JUNHWA, C_JUSO, C_DAESU, C_MEMO) Values(4, '김옥빈', '010-5666-2435', '서울시 강남구 역삼1동222', 0, null);
+Insert into CUSTOMER(C_BUN, C_IRUM, C_JUNHWA, C_JUSO, C_DAESU, C_MEMO) Values(5, '손예진', '010-5336-5687', '서울시 강남구 역삼1동333', 0, null);
+Insert into CUSTOMER(C_BUN, C_IRUM, C_JUNHWA, C_JUSO, C_DAESU, C_MEMO) Values(6, '김연아', '011-6996-9945', '서울시 강남구 역삼1동444', 0, null);
+Insert into CUSTOMER(C_BUN, C_IRUM, C_JUNHWA, C_JUSO, C_DAESU, C_MEMO) Values(7, '김연희', '010-6966-9945', '서울시 강남구 역삼1동555', 0, null);
+Insert into CUSTOMER(C_BUN, C_IRUM, C_JUNHWA, C_JUSO, C_DAESU, C_MEMO) Values(8, '이효리', '010-3289-1329', '서울시 강남구 역삼1동666', 0, null);
+Insert into CUSTOMER(C_BUN, C_IRUM, C_JUNHWA, C_JUSO, C_DAESU, C_MEMO) Values(9, '한지민', '010-3976-1328', '서울시 강남구 역삼1동777', 0, null);
+Insert into CUSTOMER(C_BUN, C_IRUM, C_JUNHWA, C_JUSO, C_DAESU, C_MEMO) Values(10, '한예슬', '010-1393-1317', '서울시 중구 필동456', 0, null);
+
+
+COMMIT;
+===========================================================
+
+SQL> select max(c_bun) from customer;
+
+MAX(C_BUN)
+----------
+        10==>10+1=11+1=>12
+=====================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,218 @@
+19일차(**컬렉션의 제너릭 개요(12장) 및 작성법,쓰레드의 개요,작성법)
+
+ 추상화->캡슐화->다형성->상속성
+
+ 컬렉션의 제너릭 개요(12장)->다형성에 포함(메서드 작성법)
+==========================================================
+chapter 12장 Generic->TypeScript에서도 사용
+============================
+
+p670
+ **제너릭의 개요
+
+컬렉션에 데이터를 저장->반드시 객체만 저장이 된다.
+->String,Integer,,,,=>자동적으로 Object형으로 변환이 된다.
+->String만 저장이 돼야되는데 Integer,Double을 저장해도=>에러가
+    발생이 안되고 저장이 된다.->원하지 않은 데이터가 저장(문제점)
+
+=>저장된 데이터를 꺼내올때 (String)==>문제가 발생=>유지보수 걸림
+=================================================================
+
+처음부터 저장할 데이터만 따로지정=>객체생성시 클래스명<자료형>
+
+*제너릭의 장점*
+
+1.지정->지정된 자료형외에는 저장불가(명확하다)
+2.꺼내올때 명시적인 형변환을 할 필요가 없다.
+===============================================
+
+ArrayListTest2.java
+******************************************************************
+p670 지네릭 클래스 선언=>클래스명<T(자료형)> ?  <T> =>클래스에 사용
+
+ 제너릭을 사용하지 않은 일반 클래스의 경우
+
+ 같은 배열이라도 자료형이 틀리기때문에 그 자료형의 배열갯수만큼
+ 멤버변수,메서드를 작성해야 된다.
+
+ =>중복된 메서드,멤버변수를 사용하는 것과 동일
+ =>제너릭 클래스를 이용=>코드를 줄일 수 가 있다.
+
+1.class 클래스명<T>{}->p670=>자료형이 Object인 대신사용하는 
+                            키워드 T(Type)->어떠한 자료형도
+                                     다 수용해주겠다는 표시
+                            (객체 자동 형변환)
+                            ==================
+ =====>이 클래스를 통해서 만든 객체의 자료형을 미리 지정해주는 경우
+
+===============================================================
+2.<?>의 의미 =>WildTest.java
+
+ 오버로딩을 사용할때의 제한부분=>매개변수,자료형이 같게되면(X)
+                               =>비슷한 기능->메서드명을 같게주자
+                               =>동적배열방법X 
+
+2.p679=><?>========>WildTest.java
+               <? extends Object>와 동일하다
+                  자바에서 만드는 클래스는 부모는 무조건  Object이기때문에
+                   ->제한이 없다.
+             ----------------------------------------
+              ->아직 자료형이 정해져 있지 않다=>Object
+              ->전달받은 자료형으로 대신사용하겠다. String-><String>
+
+             <String>,<Integer>,<Double>->자료형에 맞는 메서드를 작성
+               =>3개를 작성->코딩양이 증가->중복된 코드도 증가
+           -----------------------------------------------------------------
+           =>어떠한 자료형이든 다 처리해줄 수있는 제너릭이 있다. <?>
+          ------------------------------------------------------------------
+---------------
+ ** p680 예제**
+-----------------
+ 1.<T>=>클래스에 적용
+ 2.<?>=>메서드의 매개변수에 적용-><? extends Object>
+ 3.<? extends T>
+
+  상속과 연관 이 되어 있는 경우
+               <? extends T> =>WildExtend.java로 저장
+    //<? extends T> ->상속관계로 이루어진 클래스만 자료형으로 받게다는 표시
+//? ->자식클래스, T(부모클래스)=>부모클래스 뿐만아니라 자식클래스만 임의의
+//                               자료형만 입력을 받고싶다.
+==============================================================
+
+ 4.<? super T> =>WildExtend을 save as WildSuper.java로 저장
+================
+//<? super T> -> T(자식클래스)를 고정으로 지정해주고 자식클래스와 연관이 있는
+//                부모클래스는 다 적용이 된다.(매개변수로 허용)
+
+              //public static void printData(List<? extends Person>  list) {  //(ArrayList  list)
+	//public static void printData(List<? super Woman>  list) { //Woman,Person	
+	   public static void printData(List<? super Man>  list) { //Man,Person	허용
+	              for(Object obj:list)
+	            System.out.println(obj);//obj.toString()->문자로 출력
+	}	
+=================================================================
+
+ 지네릭 형변환<--->기본형==>가능한다
+ 지네릭<->지네릭==>형변환이 불가능하다.
+------------------------------------------------------------------
+ JDK 5.0 버전부터 추가->지네릭,열거형 추가
+------------------------------------------
+ 정적상수를 좀더 관리->열거형=>EnumTest.java
+
+  public static final int MAX=30;
+
+
+   int su=MAX;//20-->30
+
+   ...
+   int su2=MAX;//20->30
+
+   ...
+   int su3=MAX;//20->30
+
+
+
+
+
+
+
+
+
+p679 메서드의 매개변수를 선언할때 자료형으로 사용
+ 
+     <? extends T>
+     <? super T>
+     <?>
+*******************************************************************
+
+ WildExtend.java로 저장
+
+package j1229.extend;
+/*
+ * <? extends T>->상속관계로 이루어진 클래스만 자료형으로 매개변수 전달받음
+ *   ->자식클래스는 임의의 자료형만 입력을 받고, 부모클래스는 T만 매개변수로
+ *       받는다. 
+ */
+
+import java.util.*;
+
+class Person{ //부모클래스 ->T
+	String name;
+	//Person(){}
+}
+
+//Man
+class Man extends Person{ //<? extends T>
+	//String name;
+	Man(String name){
+		this.name=name;//m.name="임시";
+		//getName();
+	}
+	//getName()을 만드는 대신에 toString() 자동 호출
+	@Override
+		public String toString() {
+			// TODO Auto-generated method stub
+			return name;
+		}
+}
+
+//Woman
+class Woman extends Person{ //<? extends T>
+	//String name;
+	Woman(String name){
+		this.name=name;
+	}
+	@Override
+		public String toString() {
+			// TODO Auto-generated method stub
+			return name;
+		}
+}
+
+public class WildExtend {
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+        //Man
+		List<Man> list=new ArrayList<Man>();
+		//1.Man m=new Man("임시");
+		list.add(new Man("임시"));
+		list.add(new Man("테스트"));
+		printData(list);
+		
+		//2.Woman
+		List<Woman> list2=new ArrayList<Woman>();
+		
+		list2.add(new Woman("유관순"));
+		list2.add(new Woman("신사임당"));
+		printData(list2);
+		
+		//3.Person
+		List<Person> list3=new ArrayList<Person>();
+		list3.add(new Person());
+		printData(list3);
+		
+		//4.Double=>상속관계와 전혀 관련이 없는 클래스를 적용
+		List<Double> list4=new ArrayList();
+		list4.add(12.5); list4.add(45.6);
+		//printData(list4); 부모클래스 또는 자식클래스가 아니기때문에 적용X
+	}
+
+	 //list값을 출력 <?> ->상속뿐만 아니라 상속과 상관없이 모든 자료형을 다 수용
+	//<? extends T>->상속관계에 해당하는 클래스만 자료형을 매개변수로 받는경우
+	
+	//public static void printData(List<?> list) { (1)
+	public static void printData(List<? extends Person> list) { //(2)
+		for(Object obj:list)
+			System.out.println(obj);//obj.toString()
+	}
+		
+}
+============================================================
+
+
+
+
+
+
+
+

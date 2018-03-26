@@ -1,0 +1,160 @@
+22일차(네트워크 마무리 및 람다함수 사용법)
+
+=>Collection=>**Properties 사용**
+
+Set,List(ArrayList),Map(Hashtable,HashMap)=>
+=========================================================
+***Properties(키,value)
+--->**파일을 통해서 데이터를 저장,불러오기 기능**
+--->환경설정파일을 저장->불러오기 하기위해서(보안적인 측면)
+
+  ProTest.java
+
+ data=34,78,99 =>,을 분리기호(=토큰)=>34|78|99
+                   Double.parseDouble(data[i]);
+
+ String[] data={"34","78","99"}
+---------------------------------------------------------------
+시큐어코딩=>보안=>암호화
+
+=>외부에서 해킹이 들어왔을때 프로그램적인 소스코드에 중요한 정보가
+  들어있는 경우->가능한 정보를 노출X =>코딩하는 기법
+
+시큐어코딩 사용 목적
+
+**1.보안적인 부분->DB연동->계정명,암호,드라이브명,ip주소,포트번호
+2.프로그램의 안정화=>재귀메서드를 잘못 사용
+
+public ChatGUIServer() throws Exception{
+		//환경설정파일을 불러오는 구문
+		Properties props=new Properties();
+		//FileInputStream in=null;
+		FileInputStream in = 
+				    new FileInputStream
+				        ("C:/webtest/3.java/sou/JavaStudy/src/j0105/port.properties");
+		String service="";//임시로 저장할 포트번호
+		//입출력=>현재 파일을 불러올 수 있는 상태인지 체크->available()->-1 리턴X
+		//불러올 파일의 정보를 가지고 있으면서 파일을 불러올 수 있다면
+		if(in!=null && in.available() > 0) {
+			props.load(in);
+			service=props.getProperty("port");//"1"->""
+		}
+		if("".equals(service)) { //정상적으로 port속성을 못 불러오는 경우 왜 ""
+			service="5432";
+		}
+		int port=Integer.parseInt(service);//"1"->1
+		switch (port) {
+		case 1: port=5432;break;
+		case 2: port=5000;break;
+		case 3: port=5500;break;
+		
+		default:port=3000;
+			break;
+		}
+		System.out.println("port=>"+port);
+-------------------------
+
+=>람다함수(자바스크립트의 익명함수와 유사)
+
+                      람다식
+  자바->객체지향언어+함수형언어->함수를 이용
+             c++          c언어->함수로 이용->객체사용X
+                                 함수사용
+
+ 대세=>객체지향언어---->함수형 언어
+                        자바스크립트언어(객체지향언어X)
+                        ->TypeScript도입
+
+     =>파이썬=>객체지향언어+함수형언어
+===========================================================
+***람다식=>익명함수, 자바->메서드명,메서드명의 이름을 사용하지 않고
+                                  쓰지않고 익명이름을 사용**
+
+   형식) 반환형 메서드명 (매개변수~) {
+            내용;
+          }
+ =>  (),(매개변수~)->{
+           내용
+      }
+
+ ***람다식 작성 규칙(표 14-1) p796 ***
+
+1.매개변수가 하나인경우->()을 생략가능 (a)->   a->
+2.매개변수에 타입이 들어가 있는경우 생략불가 (int a)-> int a->(X)
+3.retrun을 이용한 수식의 경우에는 ->return을 생략해서 수식만 사용가능
+4.return이 존재하면 {}을 생략할 수 없다.
+5.내용이 많은 메서드는 블럭처리 가능하다.
+6.익명클래스의 객체와 연관지어서 사용한다. 
+
+==============================================================
+자바스크리트 기준
+
+function test(){        ===>var 변수명(test)=function(){
+         =====>함수이름
+}                            }
+
+  test()                                 test() 
+--------------------------------------------------
+  인터페이스를 이용->추상메서드를 선언->람다식과 연관해서 사용
+
+  LamTest.java로 작성
+
+
+=>TypeScript
+
+=>backend(스프링)+frontend(angular,react->vie.js(독학가능)
+                           TypeScript(2일)
+                            constructor
+
+=>Swing=>JDBC Programming 예제->JTable부착->DB연동
+       =>JTableTest.java
+----------------------------------------------------------
+컴포넌트를 생성->JFrame의 ContentPane에 부착시키는 순서
+
+=>컴포넌트를 생성시키는 순서의 역순->안쪽-->바깥쪽 방향
+
+1.JFrame--->Model-->JTable->JScrollPanle
+
+2.부착->Model->JTable에 부착
+               |
+             JTable
+               |
+            JScrollPane
+               |
+            JFrame에 결합
+----------------------------------------------------------
+**JDBC(Java Database Connectivity) 개요**
+
+자바언어를 이용해서 DB에 접속->데이터 관리를 해주는 자바언어기술
+                            CRUD(select,insert,update,delete) 작성
+
+----------------------------------------------------------------
+
+JDBC API?=>import java.sql.*=>java.sql패키지
+
+DB에 대해서 적절한 처리를 할 수 있도록 설계된 인터페이스와 클래스들의  집합
+Java 2 Platform Standard Edition(J2SE)에는 포함
+java.sql 패키지에 제공되므로 import 해야 함
+
+DB->Oracle,MySQL(=Maria),,,=>회사별로 다 틀림
+
+프린터-->자동 연결X->프로그램을 설치(Driver)
+
+JDBC Driver? =>각 회사의 홈페이지에서 다운로드
+             =>오라클에 내장
+             =>C:\oracle\product\11.2.0\dbhome_1\jdbc\lib\
+                 ojdbc6.jar파일(압축파일)
+
+                  **ojdbc14.jar(10g), 11g(ojdbc6.jar)**
+
+               =============================================
+  DB연결에 실패=>java.lang.ClassNotFoundException: oracle.jdbc.driver.OracleDriver
+  1.오타인 경우
+  2.이 드라이버가 없는 경우
+
+접속 con=>oracle.jdbc.driver.T4CConnection@23ab930d
+
+특정 DB와 통신하기 위해 어플리케이션 서버와 DB 사이를 연결하는 것
+
+
+

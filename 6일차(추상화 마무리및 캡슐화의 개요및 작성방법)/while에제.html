@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+ <head>
+  <meta charset="UTF-8">
+  <title>html5(while예제) </title>
+ </head>
+ <body>
+	<script>
+	//자바스크립트->컴파일 과정이 없다.->실행만 있다.
+	//브라우저를 통해서 결과를 보는 과정(실행)=>에러잡기가 어렵다.
+        var start=20;//start(시작값)
+		var end=10;//end(종료값)
+		
+		if (start < end) {
+		  while(start<=end) { //1<=5,,,6<=5  while(true) 
+		   document.write("while반복문 연습"+start+"<br>");
+		    start++;//i=i+1  i+=1
+		}//while
+	  }else { //start > end
+		  document.write("start값은 end값보다 클 수 가 없다");
+	  }
+	  
+
+	</script>
+ </body>
+</html>

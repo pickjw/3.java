@@ -1,0 +1,35 @@
+<!doctype html>
+<html>
+ <head>
+  <meta charset="UTF-8">
+  <title>html5(whiletest3.html) </title>
+   <script>
+     // TODO Auto-generated method stub
+		//메서드 내부에 선언된 변수는 ->지역변수
+		//1.변수선언->자료형을 쓰지 않고 var 변수명=값;
+		var start=30;//start(시작값)
+		var end=100;//end(종료값)
+		//메서드를 호출하는 방법->함수명(전달할값1,값2,,,);
+		
+		printTest(10, 20);//printTest(30,100)
+		printTest(30, 90);
+		printTest(100, 200);
+		
+	//부하직원->메서드->형식)
+   //function 함수명(=메서드명)(매개변수명,,,){ // 자료형X,반환형 X
+	function printTest(start,end) { //start=10,end=20
+		if (start < end) {
+			while(start<=end) { //1<=5,,,6<=5  while(true) 
+			   document.write("while반복문 연습"+start+"<br>");
+			   start++;//i=i+1  i+=1
+			}//while
+		  }else { //start > end
+			  document.write("start값은 end값보다 클 수 가 없다");
+		  }
+	}
+   </script>
+ </head>
+ <body>
+	
+ </body>
+</html>

@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+ <head>
+  <meta charset="UTF-8">
+  <title>html5(별출력)</title>
+  <script>
+    document.write("별을 출력<br>");//i(행),j(별),k(빈문자열)
+	//형식)for(초기식;조건식;증감식)
+      for(var i=1;i<=5;i++) {
+    	  //1.빈문자열을 출력 for문
+    	   for(var k=1;k<i;k++) {
+    		   document.write("&nbsp");//<td>&nbsp</td>
+    	   }
+    	  //2.별을 출력시켜주는 for문
+    	    for(var j=5;j>=i;j--) { 
+    	      document.write("*");
+    	  }                                           
+    	  document.write("<br>");//줄바꿈 //8)
+      }//outer for
+        document.write("이중 for문 종료");
+  </script>
+ </head>
+ <body>
+	
+ </body>
+</html>

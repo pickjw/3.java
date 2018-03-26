@@ -1,0 +1,24 @@
+<!doctype html>
+<html>
+ <head>
+  <meta charset="UTF-8">
+  <title>html5(최대값 구하기) </title>
+ </head>
+ <body>
+	<script>
+       var a=12,b=4,c=19;//c=19 ->결승
+  
+      getMaxPrint(a, b, c);//
+      getMaxPrint(35, 78, 90);
+      getMaxPrint(12, 55, 66);
+      
+	function getMaxPrint(a,b,c) { //1.매개변수 X  반환값 X
+		  var max;//최대값 저장(계산)
+	      max=(a>b)?a:b;  //(12 > 4)?12:4->12
+	      max=(max>c)?max:c;//max=(12>19)?12:19
+	      document.write("최대값(max)=>"+max+"<br>");
+	      //return max;
+	}
+	</script>
+ </body>
+</html>

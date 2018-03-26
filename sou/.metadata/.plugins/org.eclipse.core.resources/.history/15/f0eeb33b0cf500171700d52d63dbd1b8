@@ -1,0 +1,409 @@
+package j0108;
+
+import java.awt.*;
+//-----------------------------------------
+import java.sql.*;//DB연동 1)
+import java.awt.event.*;//이벤트처리
+//-------------------------------------------
+import javax.swing.*;
+import javax.swing.border.*;//스윙컴포넌트의 테두리에 관련된 클래스를 사용
+
+public class BookCustomer extends JPanel  implements ActionListener {  //extends JFrame
+
+	//고객의 정보를 저장할 변수선언(고객번호,이름,전번,주소,대여수(빌린수))
+	JTextField txtCbun,txtCirum,txtCjunhwa,txtCjuso,txtCdaesu;
+	JTextArea taCmemo;//메모(대여한 책의 정보를 기록)
+	//            신규       확인       수정       삭제      검색     옵션         종료
+	JButton btnInsert,btnOk,btnUpdate,btnDel,btnFind,btnOption,btnClose;
+	JButton btnF,btnP,btnN,btnL; //레코드의 이동버튼(<<,<,>,>>)
+	JLabel lblRec;//전체 레코드수 중에서 현재 보고 있는 레코드의 정보 (1/10)
+	
+	//현재 고객프로그램의 현재상태를 기억할 변수들
+	int iTotal = 0;	// 자료의 갯수
+	int iLast = 0; 	// 마지막 레코드 번호 ->+1=>데이터를 입력하기위해서 필요
+	//select max(c_bun) from customer;
+	
+	boolean isInsert = false;	// Insert 버튼 눌림 여부 =>insert준비단계
+	boolean isUpdate = false;	// Update 버튼 눌림 여부=>수정모드인지 아닌지체크
+	
+	//2)고객 DB 정보 저장
+	private Connection conn;
+	private Statement stmt;//SQL문
+	private ResultSet rs;//select
+	String sql=null;//sql구문을 저장
+	
+	// 3)생성자->DB연동 초기화->select해서 데이터를 출력,이벤트처리
+	public BookCustomer(){
+		this.design();
+		//추가
+		addListener();//각 버튼의 이벤트처리
+        accDb();//DB접속
+        init();//고객 테이블을 불러오는 구문(select)->오름차순 정렬
+        display();//화면에 보여달라
+	}
+	//화면디자인만 처리해주는 메서드를 작성
+	public void design(){
+		//BoxLayout->테두리를 설정해서 각 영역별로 디자인하기위해서 
+		this.setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
+		
+		//고객정보 패널============================
+		JPanel customerPn=new JPanel(new GridLayout(4,1));//4행 1열표
+		//고객정보의 테두리를 설정
+		customerPn.setBorder(new TitledBorder(new TitledBorder("고객 정보"), "", TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.LEFT));
+		//각 필드별로 왼쪽부터 오른쪽 방향으로 화면 배치를 하겠다.
+		JPanel cPn1=new JPanel(new FlowLayout(FlowLayout.LEFT));
+		JPanel cPn2=new JPanel(new FlowLayout(FlowLayout.LEFT));
+		JPanel cPn3=new JPanel(new FlowLayout(FlowLayout.LEFT));
+		JPanel cPn4=new JPanel(new FlowLayout(FlowLayout.LEFT));
+		
+		//각각에 입력받을 수있도록 JTextField을 작성
+		txtCbun=new JTextField("",5);//1.화면에 보여주는 문자열 2.문자열의 길이
+		txtCirum=new JTextField("",10);
+		txtCjunhwa=new JTextField("",15);
+		txtCjuso=new JTextField("",28);
+		txtCdaesu=new JTextField("",5);
+		taCmemo=new JTextArea(2,28);//2행,28열
+		JScrollPane scroll=new JScrollPane(taCmemo);
+		taCmemo.setBackground(Color.lightGray);
+		
+		//JTextField을 처음에는 화면에 보여주는 용도(읽기전용)
+		//setEditable(true | false)=>편집모드인지 아닌지를 체크
+		txtCbun.setEditable(false);//true->커서가 입력(데이터를 입력상태가 된다)
+		txtCirum.setEditable(false);
+		txtCjunhwa.setEditable(false);
+		txtCjuso.setEditable(false);
+		txtCdaesu.setEditable(false);
+		taCmemo.setEditable(false);
+		
+		btnInsert=new JButton("신규");
+		btnOk=new JButton("확인");
+		btnUpdate=new JButton("수정");
+		btnDel=new JButton("삭제");
+		btnFind=new JButton("검색");
+		btnOption=new JButton("옵션");
+		btnClose=new JButton("닫기");
+		
+		btnF=new JButton(" <<= ");
+		btnP=new JButton("  <= ");
+		btnN=new JButton(" =>  ");
+		btnL=new JButton(" =>> ");
+		lblRec=new JLabel(" 0 / 0 ",JLabel.CENTER); //현재레코드/전체레코드수
+		
+		cPn1.add(new JLabel("번호 :"));
+		cPn1.add(txtCbun);
+		cPn1.add(new JLabel("       이름 :"));
+		cPn1.add(txtCirum);
+		
+		cPn2.add(new JLabel("전화 :"));//JLabel은 만들면서 자동으로 추가코드
+		cPn2.add(txtCjunhwa);	
+		cPn2.add(new JLabel("      대여횟수 :"));
+		cPn2.add(txtCdaesu);
+		
+		cPn3.add(new JLabel("주소 :"));
+		cPn3.add(txtCjuso);
+		
+		cPn4.add(new JLabel("메모 :"));
+		cPn4.add(scroll);
+       //컴포넌트 부착시키는 순서->컴포넌트 생성의 역순으로 화면 배치
+		
+		customerPn.add(cPn1);  customerPn.add(cPn2);customerPn.add(cPn3);	customerPn.add(cPn4);
+		this.add(customerPn);
+		//setEditable(false)->커서입력 부분
+		btnOk.setEnabled(false);//setEnabled(true)=>확인버튼은 기본이 불활성화
+		
+		//레코드 이동 패널========================
+		JPanel movePn=new JPanel();
+		movePn.setBorder(new TitledBorder(new TitledBorder("레코드 이동"), "", TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.LEFT));
+		movePn.add(btnF);
+		movePn.add(btnP);
+		movePn.add(lblRec);
+		movePn.add(btnN);
+		movePn.add(btnL);
+		
+		this.add(movePn);
+		
+        //명령 버튼 패널========================
+		JPanel bottomPn1=new JPanel();
+		bottomPn1.setBorder(BorderFactory.createEmptyBorder(20, 0, 0, 0));
+		bottomPn1.add(btnInsert);
+		bottomPn1.add(btnOk);
+		JLabel lbl1=new JLabel("    "); 
+		bottomPn1.add(lbl1);
+		bottomPn1.add(btnUpdate);
+		bottomPn1.add(btnDel);
+		
+		JPanel bottomPn2=new JPanel();
+		bottomPn2.add(btnFind);
+		bottomPn2.add(btnOption);
+		JLabel lbl2=new JLabel("                          "); 
+		bottomPn2.add(lbl2);
+		bottomPn2.add(btnClose);
+		
+		this.add(bottomPn1);
+		this.add(bottomPn2);
+		this.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+	}
+	
+	//3)각 버튼을 눌렀을때 이벤트처리
+	private void addListener() {
+		btnInsert.addActionListener(this);//신규버튼->빈행이 만들어진다.(편집모드)
+		btnOk.addActionListener(this);//확인버튼
+		//확인버튼->비활성화->신규버튼을 누르면 활성화된다.
+		btnUpdate.addActionListener(this);//수정
+		btnDel.addActionListener(this);//삭제
+		btnFind.addActionListener(this);//검색
+		btnOption.addActionListener(this);//옵션은 디폴트
+		btnClose.addActionListener(this);//종료
+		//레코드 이동버튼
+		btnF.addActionListener(this);//<<
+		btnP.addActionListener(this);//<
+		btnN.addActionListener(this);//>
+		btnL.addActionListener(this);//>>
+	}
+	//DB접속
+	private void accDb() {
+		try {
+        	//1.접속할 데이터베이스의 드라이버를 메모리에 로드
+        	Class.forName("oracle.jdbc.driver.OracleDriver"); 
+        	//2.연결객체 얻어온다.(1.접속할 컴퓨터의 위치 2.접속할계정 3.암호)
+        	String url="jdbc:oracle:thin:@localhost:1521:orcl";
+        	conn=DriverManager.getConnection(url, "scott", "tiger");
+        	//추가(신규,수정->레코드를 이동->자동으로 스크롤 이동시 수정이 반영)
+        	//기존의 레코드번호의 변경을 반영
+        	stmt=conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
+        			ResultSet.CONCUR_UPDATABLE);
+        	/*
+        	 *ResultSet.TYPE_SCROLL_SENSITIVE=>양방향으로 스크롤이동시
+        	 *                                                           업데이트 반영 
+        	 *ResultSet.CONCUR_UPDATABLE=>현재 커서의 위치에서 정보업데이트 가능
+        	 * 
+        	 */
+            System.out.println("접속 conn=>"+conn);
+        }catch(Exception e) {
+        	System.out.println("DB접속 오류=>"+e);
+        }
+	}
+	//고객테이블을 오름차순으로 정렬
+	private void init() {
+		try {
+			sql="select * from customer order by c_bun asc";
+			rs=stmt.executeQuery(sql);
+			//전체 레코드행수->1.select max(c_bun) from customer =>웹
+			//맨 마지막 레코드번호로 이동->현재 행번호->마지막 레코드행번호
+			rs.last();
+			iTotal=rs.getRow();//현재 행번호(맨 마지막 레코드번호)
+			iLast=rs.getInt("c_bun");// 마지막 고객번호를 구해서 +1->신규행번호
+			rs.first();//첫번째 레코드부터 보여주기위해서 다시 첫번째행으로 이동
+		}catch(Exception e) {
+			System.out.println("고객테이블 불러오기 실패!=>"+e);
+		}
+	}
+	//현재 DB에 접속한 행을 화면에 출력해주는 메서드->레코드 이동
+	private void display() {
+		try {
+			//형식)->필드값 불러오기->rs.getString("필드명") ,rs.getInt("필드명")
+			//String cbun=String.valueOf(rs.getInt("c_bun"));
+			txtCbun.setText(rs.getString("c_bun"));//고객번호
+			txtCirum.setText(rs.getString("c_irum"));//고객이름
+			txtCjunhwa.setText(rs.getString("c_junhwa"));//고객전번
+			txtCdaesu.setText(rs.getString("c_daesu"));//대여수
+			txtCjuso.setText(rs.getString("c_juso"));//주소
+			taCmemo.setText(rs.getString("c_memo"));//메모
+			//rs.getRow()->현재행의 번호
+			lblRec.setText(rs.getRow()+"/"+iTotal);// 현레코드수/전체 레코드수
+		}catch(Exception e) {
+			System.out.println("display() 실행오류=>"+e);
+		}
+	}
+	
+    //p323~331->웹책의 경우
+	@Override
+		public void actionPerformed(ActionEvent e) {
+			// TODO Auto-generated method stub
+			//레코드의 이동
+		    try {
+		    	if(e.getSource()==btnF) {//<<을 눌렀다면
+		    		rs.first();//맨 처음 레코드로 이동
+		    		display();//첫번째행에 대한 데이터를 다시 출력
+		    	}else if(e.getSource()==btnP) {//<을 눌렀다면
+		    		if(rs.isFirst()) return;//첫번재행->이전행으로 이동X
+		    		rs.previous();//이전위치->다시 현재위치
+		    		display();
+		    	}else if(e.getSource()==btnN) {//>을 눌렀다면
+		    		if(rs.isLast()) return;//마지막 레코드라면 이동불가
+		    		rs.next();
+		    		display();
+		    	}else if(e.getSource()==btnL) {//>>을 눌렀다면
+		    		rs.last();
+		    		display();
+		    	}
+		    }catch(Exception e2) {
+		    	System.out.println("레코드 이동 오류=>"+e2);
+		    }
+		    //각 버튼을 클릭시 처리
+		    if(e.getSource()==btnInsert) {//신규버튼을 눌렀다면
+		    	//isInsert==false-->true로 변경 (현재 상태를 기억할 필요가 있을때)
+		    	if(isInsert==false) {//맨 처음에 누른 경우라면
+		    		//편집상태로 전환->고객번호,대여수,메모->수동 편집X
+		    		txtCirum.setEditable(true);//편집할 수 있는 상태->setEnabled(활성화)
+		    	    txtCjunhwa.setEditable(true);
+		    	    txtCjuso.setEditable(true);
+		    	    //"11"=>Integer.parseInt("11")->11->String.valueOf(11)->"11"
+		    	    txtCbun.setText(String.valueOf(iLast+1));//10+1="11"
+		    	    txtCirum.setText(null);//아직 입력하지 않은 상태
+		    	    txtCjunhwa.setText(null);
+		    	    txtCjuso.setText(null);
+		    	    txtCdaesu.setText(null);//0
+		    	    taCmemo.setText(null);
+		    	    //버튼의 상태를 변경
+		    	    btnInsert.setText("취소");//버튼의 이름
+		    	    btnOk.setEnabled(true);//확인버튼을 활성화
+		    	    isInsert=true;//한번 클릭했다고 체크
+		    	}else {//isInsert==true상태(이미 한번 누른상태)->취소->신규로 변환 
+		    		txtCirum.setEditable(false);//편집할 수 없는 상태
+		    	    txtCjunhwa.setEditable(false);
+		    	    txtCjuso.setEditable(false);
+		    	    btnInsert.setText("신규");//버튼의 이름
+		    	    btnOk.setEnabled(false);//확인버튼을 비활성화
+		    	    isInsert=false;
+		    	    display();//다시 한번 불러오기
+		    	}
+		    }else if(e.getSource()==btnOk) {//확인->실질적으로 데이터 입력
+		    	insertCustomer();//데이터 입력시켜주는 메서드
+		    	//데이터 입력후 입력전의 상태로 다시 전환
+		    	txtCirum.setEditable(false);//편집할 수 없는 상태
+	    	    txtCjunhwa.setEditable(false);
+	    	    txtCjuso.setEditable(false);
+	    	    btnInsert.setText("신규");//버튼의 이름
+	    	    btnOk.setEnabled(false);//확인버튼 비활성화
+		    }else if(e.getSource()==btnUpdate) {//수정<--->완료
+		    	if(isUpdate==false) {//수정버튼을 처음 누른경우 ->완료
+		    		txtCirum.setEditable(true);//편집할 수 있는 상태->setEnabled(활성화)
+		    	    txtCjunhwa.setEditable(true);
+		    	    txtCjuso.setEditable(true);
+		    	    //이동버튼불가->btnF.setEnabled(false)~ 4개
+		    	    btnUpdate.setText("완료");
+		    	    isUpdate=true;//현재상태가 편집상태인지를 체크
+		    	}else {//수정버튼을 두번째 누른경우(완료)->수정 마무리->실제수정
+		    		updateCustomer();
+		    		//수정->다음번 데이터가 수정할 수 있도록
+		    		txtCirum.setEditable(false);
+		    	    txtCjunhwa.setEditable(false);
+		    	    txtCjuso.setEditable(false);
+		    	    //이동버튼불가->btnF.setEnabled(false)~ 4개
+		    	    btnUpdate.setText("수정");
+		    	    isUpdate=false;
+		    	}
+		    }else if(e.getSource()==btnDel) {//삭제 버튼
+		    	//사용자에게 진짜 삭제유무?=>confirm(자바스크립트)->showConfirmDialog()
+		    	//JOptionPane클래스의 정적메서드로 구현
+		    	//1.부모창 객체(this) 2.메세지 내용 3.창의 제목 4.옵션(yes|no)
+		    	int re=JOptionPane.showConfirmDialog
+		    			(this, "현재 고객자료를 정말로 삭제할까요?", "삭제", 
+		    			 JOptionPane.YES_NO_OPTION);//~YES_OPTION,
+		    	if(re==JOptionPane.YES_OPTION) //예를 눌렀다면
+		    		deleteCustomer();
+		    	
+		    }else if(e.getSource()==btnFind) {//검색 버튼
+		    	
+		    }else if(e.getSource()==btnClose) {//종료버튼(닫기)
+		    	try {
+		    		//DB연결 순서와 정반대로 메모리를 해제
+		    		if(rs!=null) rs.close();
+		    		if(stmt!=null) stmt.close();
+		    		if(conn!=null) conn.close();
+		    		System.out.println("DB연결 해제중...");
+		    		System.exit(0);//정상종료
+		    	}catch(Exception e2) {
+		    		System.out.println("메모리 해제가 실패!!->"+e2);
+		    	}
+		    }//btnClose
+		    //insert,update,delete,select를 각각 처리해주는 메서드를 작성
+		}
+   
+	//1.insert
+   private void insertCustomer() {//sql구문을 오타조심,필드명 오타
+	   try {
+		   //형식) insert into 테이블명 values(값,'값2','2018-01-09',,,)
+		   sql="insert into customer values("+
+		           txtCbun.getText()+",'"+  //11
+				   txtCirum.getText()+"','"+
+				   txtCjunhwa.getText()+"','"+
+				   txtCjuso.getText()+"',0,'')";
+		   System.out.println("실행할 sql=>"+sql);
+		   int insert=stmt.executeUpdate(sql);//정수값을 반환->1(성공),0(실패)  
+		   System.out.println("데이터 성공유무(insert)=>"+insert);
+		   //새로 고침
+		   init();//다시 오름차순으로 정렬하기위해서
+		   rs.last();//데이터를 추가한후 전체 레코드수를 갱신(수정)하기위해서 이동
+		   display();
+	   }catch(Exception e) {
+		   System.out.println("insertCustomer()메서드 호출시 문제발생=>"+e);
+	   }
+   }
+   //2.update->insert와 거의 소스코드가 비슷(저장이 된다는 사실은 같다)
+   private void updateCustomer() {
+	   try {
+		   //수정) update 수정t명 set 수정할 필드명='수정할 값', 
+		   //                                     수정할 필드명2=값2,,, where 조건식
+		   sql="update customer set c_irum='"+
+		           txtCirum.getText()+ //이름
+		           "',c_junhwa='"+txtCjunhwa.getText()+//전번
+		           "',c_juso='"+txtCjuso.getText()+//주소
+		           "'  where c_bun="+txtCbun.getText();
+		   System.out.println("수정한 sql=>"+sql);
+		   //추가->현재 행을 구해->이동
+		   int currentRow=rs.getRow();//현재행을 구한다.->웹(현재 페이지) 단위
+		   int update=stmt.executeUpdate(sql);
+		   System.out.println("데이터 수정 성공유무(update)=>"+update);
+		   //수정이 일어나게 되면 다시 재정렬->init()
+		   init();
+		   display();//화면에 다시 출력(바뀐내용이 반영)
+	   }catch(Exception e) {
+		   System.out.println("updateCustomer()메서드 호출시 문제발생=>"+e);
+	   }
+   }
+   //3.delete=>삭제
+   private void deleteCustomer() {
+	   try {
+		   //1.삭제시킬 레코드가 없는경우->삭제할 수 없다는 에러메세지 출력
+		   if(rs.getRow()==0) {//rs.getRow()=>현재 행번호를 구한다.
+			   JOptionPane.showMessageDialog(this,"삭제시킬 자료가 없습니다");
+			   return;
+		   }
+		   //2.현재 책을 대여중인 고객(차를 리스)한 경우->삭제X
+		   if(taCmemo.getText().equals("") || taCmemo.getText()==null) {
+			   //1~12-->12번째 행을 삭제->현재행-1->이전행으로 이동
+			   int currentRow=rs.getRow();//현재 삭제시킬 행번호
+			   sql="delete from customer where c_bun="+txtCbun.getText();
+			   int delete=stmt.executeUpdate(sql);
+			   init();//삭제->고객테이블 다시 정렬
+			   if(currentRow==1) {//한개만 존재한 경우
+				   JOptionPane.showMessageDialog(this,"마지막 레코드입니다.");
+			   }else {//한개이상의 데이터가 존재하는 경우->현재 레코드를 삭제한다면
+				   //특정한 행으로 이동하라=>형식)->이동할 행번호 구하면 바로 이동
+				   //rs.absolute(이동할 행번호)=>skip해서 이동
+				   rs.absolute(currentRow-1);//현재행-1 빠진 이전행으로 이동
+			   }
+			   display();//삭제시킨후 바로 반영(화면상에서 이동)
+		   }
+		   
+	   }catch(Exception e) {
+		   System.out.println("deleteCustomer()메서드 호출에러=>"+e);
+	   }
+   }//4.select->검색
+   private void findCustomer() {
+	   
+   }
+    
+	public static void main(String[] args) {
+		BookCustomer bookCustomer=new BookCustomer();//JPanel
+		JFrame frame=new JFrame("고객 관리");
+		frame.add(bookCustomer);
+		frame.setBounds(200,200,430,450);//x,y,w,h
+		frame.setVisible(true);
+		
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	}
+	
+}

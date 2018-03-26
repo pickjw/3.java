@@ -1,0 +1,267 @@
+6일차(추상화 마무리및 캡슐화의 개요및 작성방법)
+
+ 문법=>추상화->캡슐화(개요,Setter,Getter Method)->다형성->상속성
+       -----------------------------------------
+
+과제)저장하고 싶은대상자(객체)-->설계도(클래스)
+-----------------------------------------------
+
+**프로그램 작성 순서**
+---------------------
+
+1. 문제 분석 → 2. 입출력 설계 → 3. 순서도 작성 → 4. 프로그램의 코딩 → 5.프로그램의 입력 → 6. 컴파일 및 오류수정 → 7. 테스트와 실행
+
+   
+
+1. 문제 분석
+
+무엇을 할지, 어떤 방법으로 결과를 얻어야 하는가에 대한 모든 내용을 다룸. 문제의 내용을 만족하는 해결책과 기법에 관한 내용을 살핀다
+
+   
+
+2. 입출력 설계
+
+입력데이터의 매체를 선정, 입력되는 데이터의 종류와 형식을 결정. 어떤 방법으로 출력할 것인가에 대해 설계한다.
+
+   
+
+3. 순서도 작성->ppt 제공
+
+정해진 데이터를 입력하여 원하는 정보를 얻기 위한 처리 방법과 순서를 설계하는 과정. 기호를 사용하여 작성(순서도 기호).
+
+   
+
+4. 프로그램의 코딩
+
+업무처리에 적하한 프로그램 언어를 선정하여 용지에 프로그램을 기술한다. 입출력 설계도와 순서도를 참고하여 작성하며, 언어의 종류에 따라 코딩방식이 다르다.
+
+   
+
+5. 프로그램의 입력
+
+프로그램을 적당한 입력매체를 사용하여 컴퓨터 저장장치에 기록하는 과정.
+
+   
+
+6. 컴파일 및 오류 수정
+
+입력매체를 통하여 작성한 프로그램은 "컴파일러"라는 프로그램에 의해 기계가 알아들을 수 있는 상태로 번역. 이때 프로그래밍 언어의 문법규칙에 어긋나는 내용이 나타나는데, 이러한 내용들을 오류(bug)라고 함. 프로그래머는 이 오류를 참고로 원인을 찾아내고 수정하는 작업을 하는데, 이를 디버깅(debugging)이라고 함.
+
+
+
+출처: http://linuxism.tistory.com/415 [linuxism]
+
+=======================================================
+
+package j1211;
+
+public class WhileTest2 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		
+		int start=30;//start(시작값)
+		int end=100;//end(종료값)
+		
+		//start <end 비교->참,거짓을 판별
+		if (start < end) {
+		//for(int start=10;start<=end;start++)
+		//System.out.println("while반복문 연습"+start);
+		while(start<=end) { //1<=5,,,6<=5  while(true) 
+		   System.out.println("while반복문 연습"+start);
+		   start++;//i=i+1  i+=1
+		}//while
+	  }else { //start > end
+		  System.out.println("start값은 end값보다 클 수 가 없다");
+	  }
+		//System.out.println("while종료!");
+	}
+}
+
+========================================================
+추상화(클래스)
+
+**캡슐화 개요 및 작성법**
+
+=>메서드 작성방법2
+==================
+TV->p10
+
+Computer.java->ComputerHandling.java
+Car.java=>CarHandling.java
+TV.java===>TVHandling.java->과제=>캡슐화를 적용
+============================
+하나의 파일에 하나의 클래스를 작성=>기본 원칙
+
+경우에 따라서는 하나의 파일에 여러개의 클래스를 작성할 수도 있다.
+=>몇개까지 만들 수 있다 (정해진것 없다)
+
+=>Car.java(설계)=>CarHandling.java(main())
+=>프로그램이 복잡하지 않고 단순->통합을 하는 것이 좋다.
+                               ->유지보수할때  하는 경우->복잡,불편
+----------------------------------------------------------------
+**하나의 파일에 여러개의 클래스를 작성하는데 규칙**
+
+ TV.java,TVHandling.java=>TVHandling.java로 통합
+
+1.public class로 시작하는 클래스=>파일명으로 지정한다.(핵심클래스)
+2.main()를 가지고 있는 클래스=>파일명으로 지정한다.
+3.public class로 시작하는 클래스 X ,main()도 X 클래스만 존재
+  ->아무거나 파일이름으로 지정해도 된다.(문법적)
+
+ex) public class A(main())====>A.java
+           class B
+
+ class A ->A.java
+ class B ->B.java
+ class C ->C.java
+
+4.public class로 시작하는 클래스가 한개이상 작성할 수 없다.=>에러유발
+
+public class A
+public class B
+***************************************************************
+
+ 추상화(뼈대)->테스트(문제점 체크)->해결
+
+ 추상화->데이터를 저장할 수 있는 대상자를 설계(변수,기능)
+
+==================================================================
+ **캡슐화개념->추상화된 클래스에서 올바른 값만 저장이 될 수 있도록
+               설계를 해주는 기법
+
+          **장점:올바른 값만 저장,쓰레기값은 저장X
+          **목적=>**데이터를 보호 및 은닉(감춘다)**
+===================================================================  
+
+1.멤버변수앞에 전부 private를 붙이면 된다
+  private 멤버변수=>외부(자기패키지,다른패키지)에서 접근불가능
+
+//1.기본적으로 가지고 있는 특성->8가지 자료형=>멤버변수 선언->초기값
+	private String name;//차의이름
+	private int output;//배기량->0
+	private int year;//년도->0
+	private String color;//색깔->null
+	//상태
+	private int current_speed;//차의 속도계기->0
+	private boolean sidong=false;//차의 주차상태
+
+==>외부에서 접근이 차단이 된다.=>객체명.멤버변수=저장할값
+   =>값을 자체 저장불가능=>필터
+
+  2.올바른값만 따로 입력을 받아서 처리할 수 있도록
+    처리해주는 메서드를 따로 만들어야 된다.
+   ->set메서드
+
+ 형식)
+      private=>외부에서 접근X
+      public =>외부에서 접근O=>올바른 값만 입력을 받을 수 있도록 처리
+                               메서드를 작성->매개변수 O,반환값X
+
+   public void set멤버변수명(자료형 매개변수명){
+          멤버변수=매개변수명
+   }
+
+   public 멤버변수의 반환형(자료형) get멤버변수명(){
+       return 멤버변수명;
+   }
+
+//Setter Method
+	public void setName(String n) {
+		name=n;
+	}
+	
+	public void setOutput(int o) {
+		 output=o;
+	}
+	//setYear->y
+	public void setYear(int y) {
+		year=y;
+	}
+	public void setColor(String c) {
+		color=c;
+	}
+	//current_speed
+	public void setCurrent_Speed(int cs) {
+		current_speed=cs;
+	}
+	
+	public void setSidong(boolean s) {
+		sidong=s;
+	}
+	
+	//Getter Method=>private String name;
+	public String getName() { return name;}
+	public int getOutput() {return output;}
+	public int getYear() {return year;}
+	public String getColor() {return color;}
+	public int getCurrent_Speed() { return current_speed;}
+	public boolean getSidong() {return sidong;}
+	
+=========================================================
+==>인터넷->바이러스만 차단
+
+public void setOutput(int out) {//o=-1500=>음수X  3000이상 입력X
+		if(out<=0 || out >=3000) {
+			System.out.println("배기량은 음수이거나 3000cc이상은 입력불가");
+			output=1500;//제대로 입력을 못했을 경우에 기본적으로 저장할 값
+			return;//탈출문
+		}
+		 output=out;//output=-1500
+	}
+	//setYear->y
+	public void setYear(int y) {//음수이거나 2017이상을 입력->에러유발
+	  if(y<=0 || y>2017) {
+		  System.out.println("음수이거나 2017년 이상은 입력불가입니다.!");
+	      year=2017;
+	  }else {
+		 year=y;
+	  }
+	}
+
+========================================================== 
+ 메서드를 작성하는 연습=>WhileTest3.java
+=======================
+
+ main()==>10~20,40~100,80~-120출력 =>printTest 직원(메서드)
+                                   =>10~20,40~100
+
+=>1.매개변수 X 반환값 X ->무조건 작성
+  2.main()소스코드==>부하직원 메서드 복사
+  3.메서드를 호출하는 방법
+========================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
